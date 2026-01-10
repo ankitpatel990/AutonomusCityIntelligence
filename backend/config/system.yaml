@@ -1,0 +1,52 @@
+# ========================================
+# System Configuration
+# ========================================
+
+database:
+  path: "data/traffic_intelligence.db"
+  pool_size: 10
+  timeout: 30
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins:
+    - "http://localhost:5173"
+    - "http://localhost:3000"
+    - "http://127.0.0.1:5173"
+    - "http://127.0.0.1:3000"
+
+websocket:
+  enabled: true
+  max_connections: 100
+  ping_interval: 25
+  ping_timeout: 60
+
+simulation:
+  city_size:
+    width: 1200
+    height: 800
+  junction_count: 9
+  default_spawn_rate: 20
+  max_vehicles: 200
+  time_multiplier: 5
+
+logging:
+  level: "INFO"
+  file: "logs/system.log"
+  max_size_mb: 100
+  backup_count: 5
+
+live_api:
+  enabled: true
+  provider: "tomtom"
+  cache_ttl: 60  # seconds
+  rate_limit: 100  # requests per minute
+  timeout: 5  # seconds
+
+map:
+  default_area: "sector-1-5"
+  canvas_width: 1200
+  canvas_height: 800
+  padding: 20
+

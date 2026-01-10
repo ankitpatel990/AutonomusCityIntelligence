@@ -1,0 +1,45 @@
+{
+  "density": {
+    "updateInterval": 1.0,
+    "historyRetentionSeconds": 600,
+    "detectionRadius": 30,
+    "thresholds": {
+      "lowVehicles": 5,
+      "mediumVehicles": 12,
+      "lowScore": 40,
+      "mediumScore": 70
+    },
+    "batchLogging": {
+      "enabled": true,
+      "batchSize": 100
+    }
+  },
+  "signalTiming": {
+    "minGreen": 10,
+    "maxGreen": 60,
+    "yellowDuration": 3,
+    "allRedBuffer": 1,
+    "minRed": 3
+  },
+  "liveApi": {
+    "congestionMapping": {
+      "LOW": {
+        "minSpeed": 0.8,
+        "vehiclesPerKm": 5
+      },
+      "MEDIUM": {
+        "minSpeed": 0.5,
+        "vehiclesPerKm": 15
+      },
+      "HIGH": {
+        "minSpeed": 0.2,
+        "vehiclesPerKm": 30
+      },
+      "JAM": {
+        "minSpeed": 0,
+        "vehiclesPerKm": 50
+      }
+    }
+  }
+}
+

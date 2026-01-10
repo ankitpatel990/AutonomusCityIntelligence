@@ -1,0 +1,3 @@
+# This directory stores trained RL models
+# Large model files (.zip, .pt) are ignored by git
+

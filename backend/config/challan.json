@@ -1,0 +1,38 @@
+{
+  "violations": {
+    "RED_LIGHT": {
+      "fineAmount": 1000,
+      "severity": "HIGH",
+      "description": "Running a red light"
+    },
+    "SPEEDING": {
+      "fineAmount": 2000,
+      "severity": "MEDIUM",
+      "description": "Exceeding speed limit"
+    },
+    "WRONG_DIRECTION": {
+      "fineAmount": 500,
+      "severity": "MEDIUM",
+      "description": "Driving in wrong direction"
+    },
+    "NO_STOPPING": {
+      "fineAmount": 300,
+      "severity": "LOW",
+      "description": "No stopping at stop sign"
+    }
+  },
+  "speedLimits": {
+    "road": 50,
+    "junction": 30
+  },
+  "autoPayment": {
+    "enabled": true,
+    "processingInterval": 5
+  },
+  "mockOwners": {
+    "count": 100,
+    "minBalance": 5000,
+    "maxBalance": 50000
+  }
+}
+

@@ -1,0 +1,29 @@
+{
+  "corridorLength": 5,
+  "activationLeadTime": 15,
+  "priority": "absolute",
+  "clearanceTimeout": 10,
+  "signalHoldDuration": 120,
+  "pathfinding": {
+    "algorithm": "astar",
+    "heuristic": "euclidean"
+  },
+  "vehicleTypes": {
+    "AMBULANCE": {
+      "priority": 1,
+      "maxSpeed": 80,
+      "sirenRadius": 100
+    },
+    "FIRE_TRUCK": {
+      "priority": 1,
+      "maxSpeed": 60,
+      "sirenRadius": 100
+    },
+    "POLICE": {
+      "priority": 2,
+      "maxSpeed": 100,
+      "sirenRadius": 80
+    }
+  }
+}
+

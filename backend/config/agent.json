@@ -1,0 +1,27 @@
+{
+  "loopInterval": 1.0,
+  "defaultStrategy": "RL",
+  "strategies": {
+    "RL": {
+      "modelPath": "models/ppo_traffic_final.zip",
+      "fallbackToRuleBased": true,
+      "inferenceTimeout": 100
+    },
+    "RULE_BASED": {
+      "densityThreshold": 50,
+      "minGreenTime": 10,
+      "maxGreenTime": 60
+    }
+  },
+  "monitoring": {
+    "maxLatency": 2000,
+    "errorThreshold": 5,
+    "healthCheckInterval": 5
+  },
+  "logging": {
+    "enabled": true,
+    "retentionHours": 24,
+    "batchSize": 100
+  }
+}
+

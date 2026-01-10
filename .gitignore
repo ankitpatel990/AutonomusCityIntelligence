@@ -1,0 +1,159 @@
+# ============================================
+# Autonomous City Intelligent System - .gitignore
+# ============================================
+
+# =====================
+# Documentation & PRD
+# =====================
+Documents/
+PRD/
+PRD
+
+# =====================
+# Python
+# =====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+.virtualenv/
+
+# =====================
+# Node.js / Frontend
+# =====================
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm/
+.yarn/
+
+# =====================
+# IDE & Editors
+# =====================
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sw?
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Visual Studio
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.user
+
+# =====================
+# Environment Variables
+# =====================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# =====================
+# Database
+# =====================
+*.db
+*.sqlite
+*.sqlite3
+backend/data/*.db
+
+# =====================
+# Logs
+# =====================
+logs/
+*.log
+backend/logs/
+frontend/logs/
+
+# TensorBoard
+logs/tensorboard/
+backend/logs/tensorboard/
+
+# =====================
+# ML Models (Large Files)
+# =====================
+*.zip
+*.pt
+*.pth
+*.h5
+*.onnx
+*.pkl
+backend/models/*.zip
+backend/models/*.pt
+backend/models/*.pth
+backend/models/best/
+backend/models/checkpoints/
+
+# =====================
+# Testing & Coverage
+# =====================
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
+.nyc_output/
+*.lcov
+
+# =====================
+# OS Generated
+# =====================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# =====================
+# Misc
+# =====================
+*.bak
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# Build artifacts
+*.exe
+*.dll
+*.dylib
+generate_pdf.py

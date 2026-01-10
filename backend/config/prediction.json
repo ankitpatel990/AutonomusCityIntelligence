@@ -1,0 +1,26 @@
+{
+  "predictionHorizon": 10,
+  "predictionInterval": 1,
+  "updateFrequency": 30,
+  "algorithm": "exponential_smoothing",
+  "algorithms": {
+    "moving_average": {
+      "windowSize": 10
+    },
+    "linear_trend": {
+      "windowSize": 20
+    },
+    "exponential_smoothing": {
+      "alpha": 0.3,
+      "windowSize": 30
+    }
+  },
+  "alertThresholds": {
+    "high": 50,
+    "critical": 75
+  },
+  "confidenceThreshold": 0.7,
+  "useRL": true,
+  "fallbackToTrends": true
+}
+

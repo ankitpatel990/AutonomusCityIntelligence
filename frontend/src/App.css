@@ -1,0 +1,108 @@
+/* Additional App-specific styles */
+
+/* Gradient text animation */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-text-animated {
+  background: linear-gradient(90deg, #0EA5E9, #8B5CF6, #06B6D4, #0EA5E9);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 5s ease infinite;
+}
+
+/* Pulse animation for emergency */
+@keyframes pulse-red {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+}
+
+.emergency-pulse {
+  animation: pulse-red 1s infinite;
+}
+
+/* Traffic signal glow effects */
+.signal-glow-red {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+.signal-glow-yellow {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+}
+
+.signal-glow-green {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+
+/* Vehicle markers */
+.vehicle-marker {
+  transition: transform 0.1s ease-out;
+}
+
+.vehicle-marker-emergency {
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8));
+}
+
+/* Road density colors */
+.road-low {
+  stroke: #22C55E;
+}
+
+.road-medium {
+  stroke: #F59E0B;
+}
+
+.road-high {
+  stroke: #EF4444;
+}
+
+.road-jam {
+  stroke: #991B1B;
+  animation: pulse 1s infinite;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: ease-out;
+  transition-duration: 150ms;
+}
+
+/* Disable transitions for performance-critical elements */
+.no-transition {
+  transition: none !important;
+}
+
+/* Canvas container */
+.canvas-container {
+  position: relative;
+  overflow: hidden;
+  background: 
+    linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 20px,
+      rgba(51, 65, 85, 0.1) 20px,
+      rgba(51, 65, 85, 0.1) 21px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 20px,
+      rgba(51, 65, 85, 0.1) 20px,
+      rgba(51, 65, 85, 0.1) 21px
+    );
+}

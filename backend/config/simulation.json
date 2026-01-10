@@ -1,0 +1,31 @@
+{
+  "citySize": {
+    "width": 1200,
+    "height": 800
+  },
+  "junctionCount": 9,
+  "gridLayout": {
+    "rows": 3,
+    "cols": 3
+  },
+  "spawnRate": 20,
+  "maxVehicles": 200,
+  "vehicleTypes": {
+    "car": 0.70,
+    "bike": 0.20,
+    "ambulance": 0.10
+  },
+  "timeMultiplier": 5,
+  "physics": {
+    "maxSpeed": 60,
+    "acceleration": 5,
+    "deceleration": 8,
+    "minFollowingDistance": 10
+  },
+  "signals": {
+    "defaultCycle": 60,
+    "yellowDuration": 3,
+    "allRedBuffer": 1
+  }
+}
+

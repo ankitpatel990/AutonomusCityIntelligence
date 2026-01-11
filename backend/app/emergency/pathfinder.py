@@ -61,7 +61,7 @@ class EmergencyPathfinder:
         if map_loader:
             self._build_graph_from_map_loader()
         
-        print("✅ Emergency Pathfinder initialized")
+        print("[OK] Emergency Pathfinder initialized")
         if self.junction_graph:
             print(f"   Graph nodes: {len(self.junction_graph)}")
             print(f"   Graph edges: {sum(len(v) for v in self.junction_graph.values()) // 2}")
@@ -222,16 +222,16 @@ class EmergencyPathfinder:
         
         # Build mock graph if empty
         if not self.junction_graph:
-            print("⚠️ No graph loaded, building mock graph")
+            print("[WARN] No graph loaded, building mock graph")
             self.build_mock_graph()
         
         # Validate junctions
         if start_junction_id not in self.junction_graph:
-            print(f"❌ Start junction not found: {start_junction_id}")
+            print(f"[ERROR] Start junction not found: {start_junction_id}")
             return None
         
         if end_junction_id not in self.junction_graph:
-            print(f"❌ End junction not found: {end_junction_id}")
+            print(f"[ERROR] End junction not found: {end_junction_id}")
             return None
         
         # Same start and end
@@ -267,7 +267,7 @@ class EmergencyPathfinder:
             if current.junction_id == end_junction_id:
                 path = self._reconstruct_path(parents, end_junction_id, start_junction_id)
                 elapsed = (time.time() - start_time) * 1000
-                print(f"✅ Path found: {len(path)} junctions, {iterations} iterations, {elapsed:.1f}ms")
+                print(f"[OK] Path found: {len(path)} junctions, {iterations} iterations, {elapsed:.1f}ms")
                 return path
             
             # Skip if already processed
@@ -306,7 +306,7 @@ class EmergencyPathfinder:
         
         # No path found
         elapsed = (time.time() - start_time) * 1000
-        print(f"❌ No path found: {start_junction_id} -> {end_junction_id} ({iterations} iterations, {elapsed:.1f}ms)")
+        print(f"[ERROR] No path found: {start_junction_id} -> {end_junction_id} ({iterations} iterations, {elapsed:.1f}ms)")
         return None
     
     def _heuristic(self, junction_id: str, goal_id: str) -> float:

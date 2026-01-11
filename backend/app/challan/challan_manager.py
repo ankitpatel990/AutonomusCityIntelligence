@@ -109,7 +109,7 @@ class ChallanManager:
         # Load existing challans
         self._load_from_database()
         
-        print(f"✅ Challan Manager initialized ({len(self.challans)} challans loaded)")
+        print(f"[OK] Challan Manager initialized ({len(self.challans)} challans loaded)")
     
     def set_ws_emitter(self, emitter):
         """Set WebSocket emitter for real-time notifications"""
@@ -160,7 +160,7 @@ class ChallanManager:
             
             db.close()
         except Exception as e:
-            print(f"⚠️ Could not load challans from database: {e}")
+            print(f"[WARN] Could not load challans from database: {e}")
     
     def generate_challan(self, violation: ViolationEvent) -> Optional[str]:
         """
@@ -174,14 +174,14 @@ class ChallanManager:
         """
         # Check if already processed
         if violation.violation_id in self._processed_violations:
-            print(f"⚠️ Violation already processed: {violation.violation_id}")
+            print(f"[WARN] Violation already processed: {violation.violation_id}")
             return None
         
         # Get vehicle owner
         owner = self.vehicle_owner_db.get_owner(violation.number_plate)
         
         if not owner:
-            print(f"❌ Owner not found for vehicle: {violation.number_plate}")
+            print(f"[ERROR] Owner not found for vehicle: {violation.number_plate}")
             return None
         
         # Generate challan ID
@@ -313,7 +313,7 @@ class ChallanManager:
             db.commit()
             db.close()
         except Exception as e:
-            print(f"⚠️ Could not save challan to database: {e}")
+            print(f"[WARN] Could not save challan to database: {e}")
     
     def process_auto_payment(self, challan_id: str) -> tuple[bool, Optional[str]]:
         """
@@ -355,7 +355,7 @@ class ChallanManager:
             # Update database
             self._save_to_database(challan)
             
-            print(f"✅ Challan paid: {challan_id}")
+            print(f"[OK] Challan paid: {challan_id}")
             
             # Emit WebSocket notification
             if self._ws_emitter:
@@ -367,7 +367,7 @@ class ChallanManager:
             challan.status = ChallanStatus.PENDING
             self._save_to_database(challan)
             
-            print(f"⚠️ Payment failed: {challan_id} ({error})")
+            print(f"[WARN] Payment failed: {challan_id} ({error})")
             return False, error
     
     def _save_transaction(self, challan: ChallanRecord):
@@ -392,7 +392,7 @@ class ChallanManager:
             
             db.close()
         except Exception as e:
-            print(f"⚠️ Could not save transaction: {e}")
+            print(f"[WARN] Could not save transaction: {e}")
     
     def _emit_challan_event(self, event: str, challan: ChallanRecord):
         """Emit WebSocket event for challan"""
@@ -415,7 +415,7 @@ class ChallanManager:
                 })
             )
         except Exception as e:
-            print(f"⚠️ Failed to emit challan event: {e}")
+            print(f"[WARN] Failed to emit challan event: {e}")
     
     def get_challan(self, challan_id: str) -> Optional[ChallanRecord]:
         """Get challan by ID"""
@@ -490,7 +490,7 @@ class ChallanManager:
         challan.status = ChallanStatus.CANCELLED
         self._save_to_database(challan)
         
-        print(f"❌ Challan cancelled: {challan_id} ({reason})")
+        print(f"[ERROR] Challan cancelled: {challan_id} ({reason})")
         
         return True
 

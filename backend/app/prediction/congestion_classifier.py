@@ -144,7 +144,7 @@ class CongestionClassifier:
         self.recent_alerts_per_road: Dict[str, float] = {}
         self.alert_cooldown = 60  # Seconds between alerts for same road
         
-        print("✅ Congestion Classifier initialized")
+        print("[OK] Congestion Classifier initialized")
         print(f"   Thresholds: LOW < 25, MEDIUM < {high_threshold}, HIGH < {critical_threshold}, CRITICAL >= {critical_threshold}")
     
     def classify_density(self, density: float) -> CongestionLevel:

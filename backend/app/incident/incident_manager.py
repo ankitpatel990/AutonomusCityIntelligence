@@ -150,7 +150,7 @@ class IncidentManager:
         self.total_incidents = 0
         self.total_resolved = 0
         
-        print("✅ Incident Manager initialized")
+        print("[OK] Incident Manager initialized")
     
     def set_inference_engine(self, engine):
         """Set inference engine after initialization"""
@@ -262,7 +262,7 @@ class IncidentManager:
                 incident.status = IncidentStatus.COMPLETED
                 incident.processed_at = time.time()
                 
-                print(f"✅ [INCIDENT] {incident.id} processed - "
+                print(f"[OK] [INCIDENT] {incident.id} processed - "
                       f"{len(result.probable_locations)} locations found")
                 
                 # Emit completion event
@@ -277,10 +277,10 @@ class IncidentManager:
             else:
                 incident.status = IncidentStatus.COMPLETED
                 incident.processed_at = time.time()
-                print(f"⚠️ [INCIDENT] {incident.id} - no detection history found")
+                print(f"[WARN] [INCIDENT] {incident.id} - no detection history found")
             
         except Exception as e:
-            print(f"❌ [INCIDENT] Processing error for {incident.id}: {e}")
+            print(f"[ERROR] [INCIDENT] Processing error for {incident.id}: {e}")
             incident.status = IncidentStatus.FAILED
         
         # Update in database
@@ -323,7 +323,7 @@ class IncidentManager:
         
         await self._update_incident_in_db(incident)
         
-        print(f"✅ [INCIDENT] {incident_id} resolved")
+        print(f"[OK] [INCIDENT] {incident_id} resolved")
         
         # Emit event
         if self.ws_emitter:

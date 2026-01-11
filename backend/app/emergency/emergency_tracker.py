@@ -141,7 +141,7 @@ class EmergencyTracker:
         self.cancelled_emergencies = 0
         self.total_time_saved = 0.0
         
-        print("✅ Emergency Tracker initialized")
+        print("[OK] Emergency Tracker initialized")
     
     def set_map_loader(self, map_loader):
         """Set map loader service after initialization"""
@@ -337,7 +337,7 @@ class EmergencyTracker:
             time_saved = normal_time - session.actual_travel_time
             self.total_time_saved += max(0, time_saved)
         
-        print(f"✅ Emergency completed: {session_id}")
+        print(f"[OK] Emergency completed: {session_id}")
         print(f"   Duration: {session.actual_travel_time:.1f}s")
         
         self.completed_emergencies += 1
@@ -362,7 +362,7 @@ class EmergencyTracker:
         session.status = EmergencyStatus.CANCELLED
         session.completed_at = time.time()
         
-        print(f"❌ Emergency cancelled: {session_id} - {reason}")
+        print(f"[ERROR] Emergency cancelled: {session_id} - {reason}")
         
         self.cancelled_emergencies += 1
         

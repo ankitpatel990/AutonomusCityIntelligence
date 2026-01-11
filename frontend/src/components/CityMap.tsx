@@ -37,6 +37,39 @@ const COLORS = {
   densityHigh: 'rgba(239, 68, 68, 0.3)',
 };
 
+// Map bounds for Gandhinagar area (same as backend)
+const GANDHINAGAR_BOUNDS = {
+  north: 23.2500,
+  south: 23.1800,
+  east: 72.6800,
+  west: 72.6000,
+};
+
+// Convert GPS coordinates to canvas pixel coordinates
+const gpsToCanvas = (
+  lat: number,
+  lon: number,
+  canvasWidth: number,
+  canvasHeight: number,
+  padding: number = 20
+): { x: number; y: number } => {
+  const latRange = GANDHINAGAR_BOUNDS.north - GANDHINAGAR_BOUNDS.south;
+  const lonRange = GANDHINAGAR_BOUNDS.east - GANDHINAGAR_BOUNDS.west;
+  const usableWidth = canvasWidth - 2 * padding;
+  const usableHeight = canvasHeight - 2 * padding;
+
+  // Normalize to 0-1 range
+  const xNormalized = (lon - GANDHINAGAR_BOUNDS.west) / lonRange;
+  // Y is inverted because canvas Y increases downward
+  const yNormalized = (GANDHINAGAR_BOUNDS.north - lat) / latRange;
+
+  // Scale to canvas with padding
+  const x = padding + xNormalized * usableWidth;
+  const y = padding + yNormalized * usableHeight;
+
+  return { x: Math.round(x), y: Math.round(y) };
+};
+
 export const CityMap: React.FC<CityMapProps> = ({
   width = 800,
   height = 600,
@@ -94,6 +127,24 @@ export const CityMap: React.FC<CityMapProps> = ({
   const drawRoads = useCallback((ctx: CanvasRenderingContext2D, roadData: RoadSegment[]) => {
     roadData.forEach(road => {
       const { startPos, endPos, lanes } = road.geometry;
+      
+      // Convert GPS coordinates to canvas coordinates if needed
+      // Check if coordinates are GPS (lat/lon range) or canvas pixels
+      let startX = startPos.x;
+      let startY = startPos.y;
+      let endX = endPos.x;
+      let endY = endPos.y;
+      
+      // If coordinates look like GPS (lat ~23, lon ~72), convert them
+      if (startPos.x > 70 && startPos.x < 80 && startPos.y > 20 && startPos.y < 30) {
+        const startCanvas = gpsToCanvas(startPos.y, startPos.x, width, height);
+        const endCanvas = gpsToCanvas(endPos.y, endPos.x, width, height);
+        startX = startCanvas.x;
+        startY = startCanvas.y;
+        endX = endCanvas.x;
+        endY = endCanvas.y;
+      }
+      
       const roadWidth = lanes * 12;
 
       // Road shadow
@@ -101,8 +152,8 @@ export const CityMap: React.FC<CityMapProps> = ({
       ctx.lineWidth = roadWidth + 4;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(startPos.x + 2, startPos.y + 2);
-      ctx.lineTo(endPos.x + 2, endPos.y + 2);
+      ctx.moveTo(startX + 2, startY + 2);
+      ctx.lineTo(endX + 2, endY + 2);
       ctx.stroke();
 
       // Road surface
@@ -110,8 +161,8 @@ export const CityMap: React.FC<CityMapProps> = ({
       ctx.lineWidth = roadWidth;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(startPos.x, startPos.y);
-      ctx.lineTo(endPos.x, endPos.y);
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
       ctx.stroke();
 
       // Density overlay
@@ -123,8 +174,8 @@ export const CityMap: React.FC<CityMapProps> = ({
       ctx.strokeStyle = densityColor;
       ctx.lineWidth = roadWidth - 4;
       ctx.beginPath();
-      ctx.moveTo(startPos.x, startPos.y);
-      ctx.lineTo(endPos.x, endPos.y);
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
       ctx.stroke();
 
       // Road markings (dashed center line)
@@ -132,8 +183,8 @@ export const CityMap: React.FC<CityMapProps> = ({
       ctx.lineWidth = 2;
       ctx.setLineDash([10, 10]);
       ctx.beginPath();
-      ctx.moveTo(startPos.x, startPos.y);
-      ctx.lineTo(endPos.x, endPos.y);
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
       ctx.stroke();
       ctx.setLineDash([]);
     });
@@ -141,7 +192,26 @@ export const CityMap: React.FC<CityMapProps> = ({
 
   const drawJunctions = useCallback((ctx: CanvasRenderingContext2D, junctionData: Junction[]) => {
     junctionData.forEach(junction => {
-      const { x, y } = junction.position;
+      let x: number;
+      let y: number;
+      
+      // Convert GPS coordinates to canvas coordinates if needed
+      // Priority: use lat/lon fields if available, otherwise check position
+      if (junction.lat !== undefined && junction.lon !== undefined) {
+        const canvasPos = gpsToCanvas(junction.lat, junction.lon, width, height);
+        x = canvasPos.x;
+        y = canvasPos.y;
+      } else {
+        ({ x, y } = junction.position);
+        // Check if coordinates look like GPS (lon ~72, lat ~23)
+        if (x > 70 && x < 80 && y > 20 && y < 30) {
+          // Backend stores lon as x, lat as y, so convert: gpsToCanvas(lat, lon)
+          const canvasPos = gpsToCanvas(y, x, width, height);
+          x = canvasPos.x;
+          y = canvasPos.y;
+        }
+      }
+      
       const isHovered = hoveredJunction === junction.id;
       const radius = isHovered ? 28 : 24;
 
@@ -166,48 +236,50 @@ export const CityMap: React.FC<CityMapProps> = ({
       ctx.stroke();
 
       // Traffic signals
-      const signalOffset = 35;
-      const directions: Array<{ dir: keyof typeof junction.signals; offset: { x: number; y: number } }> = [
-        { dir: 'north', offset: { x: 0, y: -signalOffset } },
-        { dir: 'east', offset: { x: signalOffset, y: 0 } },
-        { dir: 'south', offset: { x: 0, y: signalOffset } },
-        { dir: 'west', offset: { x: -signalOffset, y: 0 } },
-      ];
+      if (junction.signals) {
+        const signalOffset = 35;
+        const directions: Array<{ dir: 'north' | 'east' | 'south' | 'west'; offset: { x: number; y: number } }> = [
+          { dir: 'north', offset: { x: 0, y: -signalOffset } },
+          { dir: 'east', offset: { x: signalOffset, y: 0 } },
+          { dir: 'south', offset: { x: 0, y: signalOffset } },
+          { dir: 'west', offset: { x: -signalOffset, y: 0 } },
+        ];
 
-      directions.forEach(({ dir, offset }) => {
-        const signal = junction.signals[dir];
-        if (!signal) return;
+        directions.forEach(({ dir, offset }) => {
+          const signal = junction.signals![dir];
+          if (!signal) return;
 
-        const signalX = x + offset.x;
-        const signalY = y + offset.y;
-        
-        const color = 
-          signal.current === 'GREEN' ? COLORS.signalGreen :
-          signal.current === 'YELLOW' ? COLORS.signalYellow :
-          COLORS.signalRed;
+          const signalX = x + offset.x;
+          const signalY = y + offset.y;
+          
+          const color = 
+            signal.current === 'GREEN' ? COLORS.signalGreen :
+            signal.current === 'YELLOW' ? COLORS.signalYellow :
+            COLORS.signalRed;
 
-        // Signal glow for GREEN
-        if (signal.current === 'GREEN') {
-          const glow = ctx.createRadialGradient(signalX, signalY, 0, signalX, signalY, 15);
-          glow.addColorStop(0, color);
-          glow.addColorStop(1, 'rgba(34, 197, 94, 0)');
-          ctx.fillStyle = glow;
+          // Signal glow for GREEN
+          if (signal.current === 'GREEN') {
+            const glow = ctx.createRadialGradient(signalX, signalY, 0, signalX, signalY, 15);
+            glow.addColorStop(0, color);
+            glow.addColorStop(1, 'rgba(34, 197, 94, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(signalX, signalY, 15, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Signal circle
+          ctx.fillStyle = color;
           ctx.beginPath();
-          ctx.arc(signalX, signalY, 15, 0, Math.PI * 2);
+          ctx.arc(signalX, signalY, 8, 0, Math.PI * 2);
           ctx.fill();
-        }
 
-        // Signal circle
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(signalX, signalY, 8, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Signal border
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      });
+          // Signal border
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        });
+      }
 
       // Junction ID label
       if (showLabels) {
@@ -218,11 +290,23 @@ export const CityMap: React.FC<CityMapProps> = ({
         ctx.fillText(junction.id.substring(0, 4), x, y);
       }
     });
-  }, [hoveredJunction, showLabels]);
+  }, [hoveredJunction, showLabels, width, height]);
 
   const drawVehicles = useCallback((ctx: CanvasRenderingContext2D, vehicleData: Vehicle[]) => {
     vehicleData.forEach(vehicle => {
-      const { x, y } = vehicle.position;
+      let { x, y } = vehicle.position;
+      
+      // Convert GPS coordinates to canvas coordinates if needed
+      if (vehicle.lat && vehicle.lon) {
+        const canvasPos = gpsToCanvas(vehicle.lat, vehicle.lon, width, height);
+        x = canvasPos.x;
+        y = canvasPos.y;
+      } else if (x > 70 && x < 80 && y > 20 && y < 30) {
+        // Coordinates look like GPS (lon ~72, lat ~23)
+        const canvasPos = gpsToCanvas(y, x, width, height);
+        x = canvasPos.x;
+        y = canvasPos.y;
+      }
 
       ctx.save();
       ctx.translate(x, y);
@@ -290,7 +374,7 @@ export const CityMap: React.FC<CityMapProps> = ({
         ctx.stroke();
       }
     });
-  }, []);
+  }, [width, height]);
 
   // Main render loop
   const render = useCallback(() => {
@@ -337,8 +421,27 @@ export const CityMap: React.FC<CityMapProps> = ({
     // Check if hovering over a junction
     let found = false;
     for (const junction of junctions) {
-      const dx = x - junction.position.x;
-      const dy = y - junction.position.y;
+      let jx: number;
+      let jy: number;
+      
+      // Convert GPS coordinates to canvas coordinates if needed
+      if (junction.lat !== undefined && junction.lon !== undefined) {
+        const canvasPos = gpsToCanvas(junction.lat, junction.lon, width, height);
+        jx = canvasPos.x;
+        jy = canvasPos.y;
+      } else {
+        jx = junction.position.x;
+        jy = junction.position.y;
+        // Check if coordinates look like GPS (lon ~72, lat ~23)
+        if (jx > 70 && jx < 80 && jy > 20 && jy < 30) {
+          const canvasPos = gpsToCanvas(jy, jx, width, height);
+          jx = canvasPos.x;
+          jy = canvasPos.y;
+        }
+      }
+      
+      const dx = x - jx;
+      const dy = y - jy;
       if (Math.sqrt(dx * dx + dy * dy) < 30) {
         setHoveredJunction(junction.id);
         found = true;
@@ -348,15 +451,16 @@ export const CityMap: React.FC<CityMapProps> = ({
     if (!found) {
       setHoveredJunction(null);
     }
-  }, [junctions]);
+  }, [junctions, width, height]);
 
   return (
-    <div className="relative">
+    <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
       <canvas
         ref={canvasRef}
         width={width}
         height={height}
-        className="rounded-xl shadow-2xl shadow-cyan-500/10 border border-slate-700/50"
+        className="block rounded-xl shadow-2xl shadow-cyan-500/10 border border-slate-700/50"
+        style={{ display: 'block' }}
         onMouseMove={handleMouseMove}
         onMouseLeave={() => setHoveredJunction(null)}
       />
@@ -373,8 +477,8 @@ export const CityMap: React.FC<CityMapProps> = ({
           <p className="text-cyan-400 font-bold text-sm">Junction {hoveredJunction}</p>
           {junctions.find(j => j.id === hoveredJunction) && (
             <div className="text-xs text-slate-400 mt-1">
-              <p>Vehicles: {junctions.find(j => j.id === hoveredJunction)?.metrics.vehicleCount || 0}</p>
-              <p>Wait Time: {junctions.find(j => j.id === hoveredJunction)?.metrics.avgWaitTime.toFixed(1)}s</p>
+              <p>Vehicles: {junctions.find(j => j.id === hoveredJunction)?.metrics?.vehicleCount || 0}</p>
+              <p>Wait Time: {(junctions.find(j => j.id === hoveredJunction)?.metrics?.avgWaitTime || 0).toFixed(1)}s</p>
             </div>
           )}
         </div>

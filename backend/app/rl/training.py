@@ -552,8 +552,8 @@ def compare_strategies(
     reward_met = reward_improvement >= target_reward_improvement
     density_met = density_reduction >= target_density_reduction
     
-    print(f"   Reward Improvement ≥ {target_reward_improvement}%: {'✅' if reward_met else '❌'} ({reward_improvement:.1f}%)")
-    print(f"   Density Reduction ≥ {target_density_reduction}%: {'✅' if density_met else '❌'} ({density_reduction:.1f}%)")
+    print(f"   Reward Improvement ≥ {target_reward_improvement}%: {'[OK]' if reward_met else '[ERROR]'} ({reward_improvement:.1f}%)")
+    print(f"   Density Reduction ≥ {target_density_reduction}%: {'[OK]' if density_met else '[ERROR]'} ({density_reduction:.1f}%)")
     
     return {
         'rl': rl_results,

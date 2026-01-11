@@ -86,7 +86,7 @@ class DetectionHistoryLogger:
         self._flush_task: Optional[asyncio.Task] = None
         self._running = False
         
-        print("✅ Detection History Logger initialized")
+        print("[OK] Detection History Logger initialized")
     
     async def start(self):
         """Start background flush task"""
@@ -257,7 +257,7 @@ class DetectionHistoryLogger:
             print(f"📝 [DETECTION] Flushed {len(records)} detections to database")
             
         except Exception as e:
-            print(f"❌ [DETECTION] Flush error: {e}")
+            print(f"[ERROR] [DETECTION] Flush error: {e}")
             db.rollback()
             
             # Re-add failed records to buffer

@@ -88,7 +88,7 @@ class PredictionValidator:
         # Retention
         self.max_results = 1000  # Keep last 1000 comparisons
         
-        print("✅ Prediction Validator initialized")
+        print("[OK] Prediction Validator initialized")
     
     def record_prediction(self, prediction: 'CongestionPrediction'):
         """
@@ -246,7 +246,7 @@ class PredictionValidator:
             return comparison
             
         except Exception as e:
-            print(f"⚠️ Validation failed for {prediction.road_id}: {e}")
+            print(f"[WARN] Validation failed for {prediction.road_id}: {e}")
             return None
     
     def get_accuracy_metrics(self, time_window: int = 3600) -> Dict:

@@ -7,6 +7,7 @@
 export { Navbar } from './Navbar';
 export { Sidebar } from './Sidebar';
 export { CityMap } from './CityMap';
+export { GandhinagarMap } from './GandhinagarMap';
 export { ControlPanel } from './ControlPanel';
 export { StatisticsPanel } from './StatisticsPanel';
 export { EmergencySafetyPanel } from './EmergencySafetyPanel';

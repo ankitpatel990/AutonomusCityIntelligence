@@ -14,6 +14,8 @@ PRD
 # =====================
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 *$py.class
 *.so
 .Python
@@ -32,8 +34,24 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.whl
 pip-log.txt
 pip-delete-this-directory.txt
+.python-version
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+cython_debug/
+*.prof
+*.profraw
+*.pyi
+*.pyw
+*.pyz
+Pipfile.lock
+poetry.lock
 
 # Virtual Environment
 venv/
@@ -56,12 +74,31 @@ pnpm-debug.log*
 lerna-debug.log*
 .npm/
 .yarn/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.pnp/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+.vite/
+.turbo/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+*.map
 
 # =====================
 # IDE & Editors
 # =====================
 .idea/
 .vscode/
+.vscode-test/
+.history/
+*.code-workspace
 *.swp
 *.swo
 *.sw?
@@ -75,6 +112,16 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.user
+
+# PyCharm
+*.iml
+*.iws
+*.ipr
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+.jupyter/
 
 # =====================
 # Environment Variables
@@ -92,7 +139,11 @@ lerna-debug.log*
 *.db
 *.sqlite
 *.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
 backend/data/*.db
+backend/data/map_cache/
 
 # =====================
 # Logs
@@ -113,23 +164,36 @@ backend/logs/tensorboard/
 *.pt
 *.pth
 *.h5
+*.hdf5
 *.onnx
 *.pkl
+*.joblib
+*.sav
+*.pb
+*.tflite
+*.ckpt
 backend/models/*.zip
 backend/models/*.pt
 backend/models/*.pth
 backend/models/best/
 backend/models/checkpoints/
+models/
 
 # =====================
 # Testing & Coverage
 # =====================
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
 coverage/
 .nyc_output/
 *.lcov
+.tox/
+.hypothesis/
+test-results/
+playwright-report/
+playwright/.cache/
 
 # =====================
 # OS Generated
@@ -151,9 +215,32 @@ Desktop.ini
 *.temp
 *.cache
 .cache/
+*.orig
+*.rej
+*.patch
+*.diff
+
+# Root-level test files (should be in tests/ directory)
+test_*.py
+*_test.py
 
 # Build artifacts
 *.exe
 *.dll
 *.dylib
+*.bin
+*.o
+*.a
+*.lib
+
+# Archives (if not needed)
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.gz
+*.bz2
+
+# Project-specific
 generate_pdf.py

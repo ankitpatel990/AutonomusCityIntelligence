@@ -19,6 +19,7 @@ import json
 import time
 from typing import Dict, List, Optional, Tuple, Any
 from pathlib import Path
+from dataclasses import dataclass
 from pydantic import BaseModel, Field
 
 # OSMnx may not be installed in all environments
@@ -52,6 +53,13 @@ from app.models.road import (
     RoadGeometry,
     RoadTraffic,
 )
+
+# Import hardcoded junctions and roads from system_routes (single source of truth)
+# Using lazy import to avoid circular dependencies
+def _get_hardcoded_data():
+    """Lazy import of hardcoded data from system_routes"""
+    from app.api.system_routes import HARDCODED_JUNCTIONS, HARDCODED_ROADS
+    return HARDCODED_JUNCTIONS, HARDCODED_ROADS
 
 
 class RealJunction(BaseModel):
@@ -185,6 +193,158 @@ PREDEFINED_AREAS: Dict[str, PredefinedArea] = {
 }
 
 
+# ==============================================================================
+# GANDHINAGAR 9 JUNCTIONS - Hardcoded 3x3 Grid of Major Circles
+# Exact GPS coordinates for main GH road circles
+# ==============================================================================
+
+@dataclass
+class MajorCircle:
+    """A major circle/intersection in Gandhinagar"""
+    id: str
+    name: str
+    lat: float
+    lon: float
+    row: int = 0      # Grid row (0=top/north, 2=bottom/south)
+    col: int = 0      # Grid column (0=left/west, 2=right/east)
+    description: str = ""
+    gh_road: str = ""  # Associated GH road (e.g., "GH-2", "GH-3")
+
+
+# 9 Junctions arranged in 3x3 Grid:
+# 
+#   COL 0 (West)     COL 1 (Center)    COL 2 (East)
+#   ─────────────────────────────────────────────────
+#   [0,0] GH-6       [0,1] Sachivalay  [0,2] Sec-22    ROW 0 (North)
+#   [1,0] GH-2       [1,1] Central     [1,2] Sec-16    ROW 1 (Middle)
+#   [2,0] GH-3       [2,1] GH-4        [2,2] GH-5      ROW 2 (South)
+#
+# Roads connect horizontally and vertically forming a grid pattern.
+
+GANDHINAGAR_MAJOR_CIRCLES: List[MajorCircle] = [
+    # ═══════════════════════════════════════════════════════════════════
+    # ROW 0 (Top/North Row) - lat ~23.215-23.224
+    # ═══════════════════════════════════════════════════════════════════
+    MajorCircle(
+        id="J-0-0",
+        name="GH-6 Circle",
+        lat=23.215302,
+        lon=72.622431,
+        row=0, col=0,
+        description="GH-6 Road Circle - Northwest",
+        gh_road="GH-6"
+    ),
+    MajorCircle(
+        id="J-0-1",
+        name="Sachivalay Circle",
+        lat=23.223669,
+        lon=72.627419,
+        row=0, col=1,
+        description="Government Secretariat Circle - North Center",
+        gh_road=""
+    ),
+    MajorCircle(
+        id="J-0-2",
+        name="Sector 22/28 Circle",
+        lat=23.220104,
+        lon=72.634228,
+        row=0, col=2,
+        description="Sector 22/28 Junction - Northeast",
+        gh_road=""
+    ),
+    
+    # ═══════════════════════════════════════════════════════════════════
+    # ROW 1 (Middle Row) - lat ~23.207-23.217
+    # ═══════════════════════════════════════════════════════════════════
+    MajorCircle(
+        id="J-1-0",
+        name="GH-2 Circle",
+        lat=23.207225,
+        lon=72.617206,
+        row=1, col=0,
+        description="GH-2 Road Circle - West",
+        gh_road="GH-2"
+    ),
+    MajorCircle(
+        id="J-1-1",
+        name="Central Junction",
+        lat=23.211664,
+        lon=72.629002,
+        row=1, col=1,
+        description="Central Gandhinagar Junction - Center",
+        gh_road="CH"
+    ),
+    MajorCircle(
+        id="J-1-2",
+        name="Sector 16 Circle",
+        lat=23.216482,
+        lon=72.640956,
+        row=1, col=2,
+        description="Sector 16 Circle - East",
+        gh_road=""
+    ),
+    
+    # ═══════════════════════════════════════════════════════════════════
+    # ROW 2 (Bottom/South Row) - lat ~23.201-23.208
+    # ═══════════════════════════════════════════════════════════════════
+    MajorCircle(
+        id="J-2-0",
+        name="GH-3 Circle",
+        lat=23.203569,
+        lon=72.624094,
+        row=2, col=0,
+        description="GH-3 Road Circle - Southwest",
+        gh_road="GH-3"
+    ),
+    MajorCircle(
+        id="J-2-1",
+        name="GH-4 Circle",
+        lat=23.201914,
+        lon=72.632327,
+        row=2, col=1,
+        description="GH-4 Road Circle - South Center",
+        gh_road="GH-4"
+    ),
+    MajorCircle(
+        id="J-2-2",
+        name="GH-5 Circle",
+        lat=23.208244,
+        lon=72.636048,
+        row=2, col=2,
+        description="GH-5 Road Circle - Southeast",
+        gh_road="GH-5"
+    ),
+]
+
+# Helper to get junction by grid position
+def get_junction_by_grid(row: int, col: int) -> Optional[MajorCircle]:
+    """Get a junction from the grid by row and column"""
+    for j in GANDHINAGAR_MAJOR_CIRCLES:
+        if j.row == row and j.col == col:
+            return j
+    return None
+
+# Grid-based road definitions (connects adjacent junctions)
+# Format: (start_row, start_col, end_row, end_col, road_name)
+GRID_ROADS = [
+    # Horizontal roads (West to East)
+    (0, 0, 0, 1, "GH-6 to Sachivalay Road"),
+    (0, 1, 0, 2, "Sachivalay to Sector-22 Road"),
+    (1, 0, 1, 1, "GH-2 to Central Road"),
+    (1, 1, 1, 2, "Central to Sector-16 Road"),
+    (2, 0, 2, 1, "GH-3 to GH-4 Road"),
+    (2, 1, 2, 2, "GH-4 to GH-5 Road"),
+    
+    # Vertical roads (North to South)
+    (0, 0, 1, 0, "GH-6 to GH-2 Road"),
+    (1, 0, 2, 0, "GH-2 to GH-3 Road"),
+    (0, 1, 1, 1, "Sachivalay to Central Road"),
+    (1, 1, 2, 1, "Central to GH-4 Road"),
+    (0, 2, 1, 2, "Sector-22 to Sector-16 Road"),
+    (1, 2, 2, 2, "Sector-16 to GH-5 Road"),
+]
+
+
 class MapLoaderService:
     """
     Load OpenStreetMap data for real city geography
@@ -243,6 +403,203 @@ class MapLoaderService:
     def get_predefined_areas(self) -> Dict[str, PredefinedArea]:
         """Get all predefined map areas"""
         return PREDEFINED_AREAS
+    
+    def get_major_circles(self) -> List[MajorCircle]:
+        """Get all predefined major Gandhinagar circles"""
+        return GANDHINAGAR_MAJOR_CIRCLES
+    
+    def load_major_circles_only(
+        self,
+        proximity_meters: float = 200.0
+    ) -> List[RealJunction]:
+        """
+        Load the 9 hardcoded Gandhinagar junctions from system_routes.
+        Also creates 12 roads connecting them matching HARDCODED_ROADS.
+        
+        Uses HARDCODED_JUNCTIONS and HARDCODED_ROADS from system_routes.py
+        as the single source of truth to ensure consistency.
+        
+        Args:
+            proximity_meters: Not used (kept for compatibility)
+            
+        Returns:
+            List of RealJunction objects for the 9 junctions
+        """
+        import math
+        
+        # Get hardcoded data from system_routes (single source of truth)
+        HARDCODED_JUNCTIONS, HARDCODED_ROADS = _get_hardcoded_data()
+        
+        major_junctions: List[RealJunction] = []
+        grid_roads: List[RealRoad] = []
+        
+        # Calculate bounds from HARDCODED_JUNCTIONS
+        lats = [j["lat"] for j in HARDCODED_JUNCTIONS]
+        lons = [j["lon"] for j in HARDCODED_JUNCTIONS]
+        
+        # Add padding to bounds
+        padding = 0.01  # ~1km padding
+        bounds = MapBounds(
+            north=max(lats) + padding,
+            south=min(lats) - padding,
+            east=max(lons) + padding,
+            west=min(lons) - padding
+        )
+        
+        self.current_bounds = bounds
+        self.converter = CoordinateConverter(
+            canvas_width=self.canvas_width,
+            canvas_height=self.canvas_height,
+            map_bounds=bounds
+        )
+        
+        # Create junction lookup by ID
+        junction_lookup: Dict[str, RealJunction] = {}
+        
+        # Create RealJunction from HARDCODED_JUNCTIONS (use J-1, J-2 format)
+        for idx, j_data in enumerate(HARDCODED_JUNCTIONS):
+            # Convert GPS to canvas coordinates
+            canvas_coords = self.converter.gps_to_canvas(j_data["lat"], j_data["lon"])
+            
+            # Use the same ID format as system_routes (J-1, J-2, etc.)
+            junction_id = j_data["id"]  # "J-1", "J-2", etc.
+            junction = RealJunction(
+                id=junction_id,
+                osm_id=idx + 1000000,  # Synthetic OSM ID
+                lat=j_data["lat"],
+                lon=j_data["lon"],
+                x=canvas_coords.x,
+                y=canvas_coords.y,
+                name=j_data["name"],
+                landmark=j_data["name"],
+                street_count=4,  # Grid junctions have 4 roads
+                signals=create_default_signals('north'),
+                connected_roads=[],
+                mode="NORMAL"
+            )
+            major_junctions.append(junction)
+            junction_lookup[junction_id] = junction
+        
+        # Create roads from HARDCODED_ROADS (matching system_routes)
+        for road_data in HARDCODED_ROADS:
+            start_id = road_data["startJunction"]  # "J-1"
+            end_id = road_data["endJunction"]      # "J-2"
+            
+            start_j = junction_lookup.get(start_id)
+            end_j = junction_lookup.get(end_id)
+            
+            if start_j and end_j:
+                # Calculate road length using Haversine formula
+                R = 6371000  # Earth radius in meters
+                phi1, phi2 = math.radians(start_j.lat), math.radians(end_j.lat)
+                delta_phi = math.radians(end_j.lat - start_j.lat)
+                delta_lambda = math.radians(end_j.lon - start_j.lon)
+                a = math.sin(delta_phi/2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda/2)**2
+                c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+                distance = R * c
+                
+                # Create RealRoad matching HARDCODED_ROADS structure
+                road = RealRoad(
+                    id=road_data["id"],  # "R-1-2", "R-2-3", etc. (matches system_routes)
+                    osm_id=f"hardcoded-{road_data['id']}",
+                    start_junction_id=start_j.id,
+                    end_junction_id=end_j.id,
+                    start_lat=start_j.lat,
+                    start_lon=start_j.lon,
+                    end_lat=end_j.lat,
+                    end_lon=end_j.lon,
+                    start_x=start_j.x,
+                    start_y=start_j.y,
+                    end_x=end_j.x,
+                    end_y=end_j.y,
+                    name=road_data["name"],
+                    length=distance,
+                    max_speed=road_data.get("maxSpeed", 50.0),
+                    lanes=road_data["geometry"]["lanes"],
+                    road_type=road_data.get("roadType", "secondary"),
+                    oneway=road_data.get("oneway", False)
+                )
+                grid_roads.append(road)
+                
+                # Update connected roads for junctions
+                start_j.connected_roads.append(road.id)
+                end_j.connected_roads.append(road.id)
+        
+        # Update the internal lists
+        self.junctions = major_junctions
+        self.roads = grid_roads
+        
+        print(f"[MapLoader] ======================================================")
+        print(f"[MapLoader] Loaded HARDCODED Grid from system_routes:")
+        print(f"[MapLoader]   Junctions: {len(major_junctions)}")
+        print(f"[MapLoader]   Roads: {len(grid_roads)}")
+        print(f"[MapLoader] ======================================================")
+        print(f"[MapLoader] Junction IDs: {[j.id for j in major_junctions]}")
+        print(f"[MapLoader] Road IDs: {[r.id for r in grid_roads]}")
+        print(f"[MapLoader] ======================================================")
+        
+        return major_junctions
+    
+    def filter_junctions_to_major_circles(
+        self,
+        proximity_meters: float = 150.0
+    ) -> List[RealJunction]:
+        """
+        Filter already-loaded junctions to keep only those near major circles.
+        
+        Use this AFTER loading from OSM (load_by_bbox, etc.) to filter
+        junctions to only the famous circles.
+        
+        Args:
+            proximity_meters: How close (in meters) a junction must be to a 
+                            major circle to be kept
+            
+        Returns:
+            Filtered list of RealJunction objects
+        """
+        if not self.junctions:
+            print("[MapLoader] No junctions loaded yet. Call load_by_bbox first.")
+            return []
+        
+        # Haversine distance function
+        import math
+        def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+            """Calculate distance in meters between two GPS points"""
+            R = 6371000  # Earth radius in meters
+            phi1, phi2 = math.radians(lat1), math.radians(lat2)
+            delta_phi = math.radians(lat2 - lat1)
+            delta_lambda = math.radians(lon2 - lon1)
+            
+            a = math.sin(delta_phi/2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda/2)**2
+            c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+            
+            return R * c
+        
+        filtered_junctions: List[RealJunction] = []
+        matched_circles = set()
+        
+        for junction in self.junctions:
+            for circle in GANDHINAGAR_MAJOR_CIRCLES:
+                distance = haversine_distance(
+                    junction.lat, junction.lon,
+                    circle.lat, circle.lon
+                )
+                
+                if distance <= proximity_meters:
+                    # Update junction with circle's name for clarity
+                    junction.name = circle.name
+                    junction.landmark = circle.description
+                    filtered_junctions.append(junction)
+                    matched_circles.add(circle.name)
+                    break  # Junction matched, move to next junction
+        
+        # Update internal list
+        self.junctions = filtered_junctions
+        
+        print(f"[MapLoader] Filtered to {len(filtered_junctions)} junctions near major circles")
+        print(f"[MapLoader] Matched circles: {matched_circles}")
+        
+        return filtered_junctions
     
     def load_predefined_area(self, area_key: str) -> OSMLoadResult:
         """

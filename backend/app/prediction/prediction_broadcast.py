@@ -67,7 +67,7 @@ class PredictionBroadcastService:
         
         self._running = True
         self._task = asyncio.create_task(self._broadcast_loop())
-        print("✅ Prediction broadcast service started")
+        print("[OK] Prediction broadcast service started")
     
     async def stop(self):
         """Stop the background broadcast task"""
@@ -125,7 +125,7 @@ class PredictionBroadcastService:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                print(f"❌ Prediction broadcast error: {e}")
+                print(f"[ERROR] Prediction broadcast error: {e}")
                 await asyncio.sleep(5)
     
     async def _broadcast_predictions(self, predictions: dict, classifier):
@@ -167,7 +167,7 @@ class PredictionBroadcastService:
             self.last_broadcast_time = current_time
             
         except Exception as e:
-            print(f"⚠️ Failed to broadcast predictions: {e}")
+            print(f"[WARN] Failed to broadcast predictions: {e}")
     
     async def _broadcast_alerts(self, alerts: list):
         """Broadcast prediction alerts"""
@@ -197,7 +197,7 @@ class PredictionBroadcastService:
             self.total_alerts_sent += len(alerts)
             
         except Exception as e:
-            print(f"⚠️ Failed to broadcast alerts: {e}")
+            print(f"[WARN] Failed to broadcast alerts: {e}")
     
     async def broadcast_single_alert(self, alert):
         """Broadcast a single alert immediately"""

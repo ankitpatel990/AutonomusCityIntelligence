@@ -123,7 +123,7 @@ class PredictionEngine:
         # Optional: Neural network predictor
         self._nn_predictor = None
         
-        print("✅ Prediction Engine initialized")
+        print("[OK] Prediction Engine initialized")
         print(f"   Algorithm: {self.algorithm}")
         print(f"   Horizon: {self.prediction_horizon} minutes")
         print(f"   Update frequency: {self.update_frequency}s")
@@ -456,7 +456,7 @@ class PredictionEngine:
                 current_density=current_density
             )
         except Exception as e:
-            print(f"⚠️ NN prediction failed for {road_id}: {e}")
+            print(f"[WARN] NN prediction failed for {road_id}: {e}")
             return self._predict_exponential_smoothing(road_id, history, current_density)
     
     def set_neural_network_predictor(self, nn_predictor):
@@ -467,7 +467,7 @@ class PredictionEngine:
             nn_predictor: NeuralNetworkPredictor instance
         """
         self._nn_predictor = nn_predictor
-        print("✅ Neural network predictor set")
+        print("[OK] Neural network predictor set")
     
     def set_algorithm(self, algorithm: str):
         """
@@ -488,7 +488,7 @@ class PredictionEngine:
         
         self.algorithm = algorithm
         self.predictions_cache.clear()  # Clear cache on algorithm change
-        print(f"✅ Algorithm changed to: {algorithm}")
+        print(f"[OK] Algorithm changed to: {algorithm}")
     
     def get_statistics(self) -> dict:
         """Get prediction engine statistics"""

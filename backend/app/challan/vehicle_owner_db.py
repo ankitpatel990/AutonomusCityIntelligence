@@ -91,7 +91,7 @@ class VehicleOwnerDatabase:
         # Load existing owners from database
         self._load_from_database()
         
-        print(f"✅ Vehicle Owner Database initialized ({len(self.owners)} owners loaded)")
+        print(f"[OK] Vehicle Owner Database initialized ({len(self.owners)} owners loaded)")
     
     def _load_from_database(self):
         """Load existing owners from SQLite database"""
@@ -118,7 +118,7 @@ class VehicleOwnerDatabase:
             
             db.close()
         except Exception as e:
-            print(f"⚠️ Could not load owners from database: {e}")
+            print(f"[WARN] Could not load owners from database: {e}")
     
     def _generate_number_plate(self) -> str:
         """Generate a realistic Gujarat number plate"""
@@ -217,7 +217,7 @@ class VehicleOwnerDatabase:
             db.commit()
             db.close()
         except Exception as e:
-            print(f"⚠️ Could not save owner to database: {e}")
+            print(f"[WARN] Could not save owner to database: {e}")
     
     def get_owner(self, number_plate: str) -> Optional[VehicleOwnerRecord]:
         """
@@ -262,7 +262,7 @@ class VehicleOwnerDatabase:
         
         # Check sufficient balance
         if owner.wallet_balance < amount:
-            print(f"⚠️ Insufficient balance for {number_plate}: ₹{owner.wallet_balance:.2f} < ₹{amount:.2f}")
+            print(f"[WARN] Insufficient balance for {number_plate}: ₹{owner.wallet_balance:.2f} < ₹{amount:.2f}")
             return False, f"Insufficient balance: ₹{owner.wallet_balance:.2f}"
         
         # Deduct amount
@@ -336,7 +336,7 @@ class VehicleOwnerDatabase:
             if number_plate not in self.owners:
                 self.register_vehicle(number_plate)
         
-        print(f"✅ Seeded {count} mock vehicle owners")
+        print(f"[OK] Seeded {count} mock vehicle owners")
 
 
 # Global instance

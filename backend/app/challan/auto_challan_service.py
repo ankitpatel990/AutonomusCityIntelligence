@@ -68,7 +68,7 @@ class AutoChallanService:
         # WebSocket emitter
         self._ws_emitter = None
         
-        print("✅ Auto-Challan Service initialized")
+        print("[OK] Auto-Challan Service initialized")
     
     def set_ws_emitter(self, emitter):
         """Set WebSocket emitter for notifications"""
@@ -79,11 +79,11 @@ class AutoChallanService:
     async def start(self):
         """Start automated challan processing"""
         if self.running:
-            print("⚠️ Auto-challan service already running")
+            print("[WARN] Auto-challan service already running")
             return
         
         self.running = True
-        print("🚀 Auto-Challan service started")
+        print("[START] Auto-Challan service started")
         
         # Start processing loop
         self._task = asyncio.create_task(self._processing_loop())
@@ -114,7 +114,7 @@ class AutoChallanService:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                print(f"❌ Auto-challan processing error: {e}")
+                print(f"[ERROR] Auto-challan processing error: {e}")
                 await asyncio.sleep(1)
     
     async def _process_violations(self):
@@ -143,7 +143,7 @@ class AutoChallanService:
             challan_id = self.challan_manager.generate_challan(violation)
             
             if not challan_id:
-                print(f"⚠️ Could not generate challan for {violation.violation_id}")
+                print(f"[WARN] Could not generate challan for {violation.violation_id}")
                 return
             
             self.total_processed += 1
@@ -161,7 +161,7 @@ class AutoChallanService:
                     self.total_failed += 1
         
         except Exception as e:
-            print(f"❌ Error processing violation {violation.violation_id}: {e}")
+            print(f"[ERROR] Error processing violation {violation.violation_id}: {e}")
     
     def process_violation_sync(self, violation: ViolationEvent) -> Optional[str]:
         """
@@ -214,7 +214,7 @@ class AutoChallanService:
         
         self.last_processed_index = len(self.violation_detector.violations)
         
-        print(f"✅ Force processed {len(violations)} violations")
+        print(f"[OK] Force processed {len(violations)} violations")
 
 
 # Global instance

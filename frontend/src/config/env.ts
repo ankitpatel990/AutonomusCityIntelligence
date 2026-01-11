@@ -6,8 +6,8 @@
 
 export const config = {
   // API Configuration
-  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8001/api',
-  wsUrl: import.meta.env.VITE_WS_URL || 'http://localhost:8001',
+  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  wsUrl: import.meta.env.VITE_WS_URL || 'http://localhost:8000',
   
   // Environment
   isDevelopment: import.meta.env.DEV,

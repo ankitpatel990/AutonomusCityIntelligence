@@ -116,7 +116,7 @@ class ViolationDetector:
         # WebSocket emitter for real-time notifications
         self._ws_emitter = None
         
-        print("✅ Violation Detector initialized")
+        print("[OK] Violation Detector initialized")
     
     def set_ws_emitter(self, emitter):
         """Set WebSocket emitter for real-time notifications"""
@@ -346,7 +346,7 @@ class ViolationDetector:
                     })
                 )
             except Exception as e:
-                print(f"⚠️ Failed to emit violation event: {e}")
+                print(f"[WARN] Failed to emit violation event: {e}")
         
         return violation
     

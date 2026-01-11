@@ -99,15 +99,20 @@ export interface JunctionMetrics {
 export interface Junction {
   id: string;
   position: Position;
-  signals: JunctionSignals;
-  connectedRoads: {
-    north: string | null;
-    east: string | null;
-    south: string | null;
-    west: string | null;
-  };
-  metrics: JunctionMetrics;
-  lastSignalChange: number;
+  signals?: JunctionSignals;
+  connectedRoads: string[];  // Array of connected road IDs
+  metrics?: JunctionMetrics;
+  lastSignalChange?: number;
+  name?: string;
+  lat?: number;
+  lon?: number;
+  mode?: string;
+  streetCount?: number;
+  signalState?: SignalColor;  // Simplified signal state for hardcoded junctions
+  greenPhase?: string;
+  phaseTime?: number;
+  vehicleCount?: number;
+  avgWaitTime?: number;
 }
 
 // ============================================

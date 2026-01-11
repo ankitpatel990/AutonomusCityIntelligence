@@ -80,7 +80,7 @@ class VehicleInferenceEngine:
         self.total_inferences = 0
         self.avg_inference_time_ms = 0
         
-        print("✅ Vehicle Inference Engine initialized")
+        print("[OK] Vehicle Inference Engine initialized")
     
     def set_map_service(self, map_service):
         """Set map service after initialization"""

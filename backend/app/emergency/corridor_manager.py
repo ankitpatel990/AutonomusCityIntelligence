@@ -100,7 +100,7 @@ class GreenCorridorManager:
         self.corridors_activated = 0
         self.corridors_completed = 0
         
-        print("✅ Green Corridor Manager initialized")
+        print("[OK] Green Corridor Manager initialized")
     
     def set_dependencies(
         self,
@@ -133,14 +133,14 @@ class GreenCorridorManager:
             True if corridor activated successfully
         """
         if not self.emergency_tracker:
-            print("❌ Emergency tracker not available")
+            print("[ERROR] Emergency tracker not available")
             return False
         
         # Get emergency session
         session = self.emergency_tracker.get_session(session_id)
         
         if not session:
-            print(f"❌ Emergency session not found: {session_id}")
+            print(f"[ERROR] Emergency session not found: {session_id}")
             return False
         
         print(f"🟢 Activating green corridor: {session_id}")
@@ -160,7 +160,7 @@ class GreenCorridorManager:
             junction_path = self.pathfinder.find_path(start_junction, end_junction)
         
         if not junction_path:
-            print(f"❌ No path found for corridor: {start_junction} -> {end_junction}")
+            print(f"[ERROR] No path found for corridor: {start_junction} -> {end_junction}")
             # Use simple direct path as fallback
             junction_path = [start_junction, end_junction]
         
@@ -337,7 +337,7 @@ class GreenCorridorManager:
                 session = self.emergency_tracker.get_session(session_id)
                 
                 if not session:
-                    print("❌ Session lost, deactivating corridor")
+                    print("[ERROR] Session lost, deactivating corridor")
                     await self.deactivate_corridor()
                     break
                 
@@ -371,7 +371,7 @@ class GreenCorridorManager:
                 print("📡 Corridor monitoring cancelled")
                 break
             except Exception as e:
-                print(f"❌ Corridor monitoring error: {e}")
+                print(f"[ERROR] Corridor monitoring error: {e}")
                 await asyncio.sleep(self.update_interval)
         
         print("📡 Corridor monitoring stopped")

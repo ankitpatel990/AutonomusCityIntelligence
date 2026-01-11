@@ -22,7 +22,7 @@ try:
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
-    print("ℹ️ PyTorch not available. Neural network predictor disabled.")
+    print("[INFO] PyTorch not available. Neural network predictor disabled.")
 
 
 if TORCH_AVAILABLE:
@@ -139,7 +139,7 @@ class NeuralNetworkPredictor:
         if TORCH_AVAILABLE:
             self._initialize_model()
         else:
-            print("⚠️ Neural Network Predictor: PyTorch not available")
+            print("[WARN] Neural Network Predictor: PyTorch not available")
     
     def _initialize_model(self):
         """Initialize PyTorch model and training components"""
@@ -162,13 +162,13 @@ class NeuralNetworkPredictor:
             )
             self.criterion = nn.MSELoss()
             
-            print("✅ Neural Network Predictor initialized")
+            print("[OK] Neural Network Predictor initialized")
             print(f"   Device: {self.device}")
             print(f"   Sequence length: {self.sequence_length}")
             print(f"   Prediction horizon: {self.prediction_horizon}")
             
         except Exception as e:
-            print(f"⚠️ Failed to initialize NN model: {e}")
+            print(f"[WARN] Failed to initialize NN model: {e}")
             self.model = None
     
     def is_available(self) -> bool:
@@ -212,7 +212,7 @@ class NeuralNetworkPredictor:
             return predictions.squeeze().cpu().tolist()
             
         except Exception as e:
-            print(f"⚠️ NN prediction failed: {e}")
+            print(f"[WARN] NN prediction failed: {e}")
             last_value = history[-1] if history else 50.0
             return [last_value] * self.prediction_horizon
     
@@ -267,7 +267,7 @@ class NeuralNetworkPredictor:
             return loss_value
             
         except Exception as e:
-            print(f"⚠️ Online update failed: {e}")
+            print(f"[WARN] Online update failed: {e}")
             return 0.0
     
     def save_model(self, path: str):
@@ -278,7 +278,7 @@ class NeuralNetworkPredictor:
             path: File path for model
         """
         if not self.is_available():
-            print("⚠️ Cannot save - model not available")
+            print("[WARN] Cannot save - model not available")
             return
         
         try:
@@ -289,9 +289,9 @@ class NeuralNetworkPredictor:
                 'total_predictions': self.total_predictions,
                 'total_updates': self.total_updates
             }, path)
-            print(f"✅ Model saved to {path}")
+            print(f"[OK] Model saved to {path}")
         except Exception as e:
-            print(f"⚠️ Failed to save model: {e}")
+            print(f"[WARN] Failed to save model: {e}")
     
     def load_model(self, path: str) -> bool:
         """
@@ -304,11 +304,11 @@ class NeuralNetworkPredictor:
             True if loaded successfully
         """
         if not TORCH_AVAILABLE:
-            print("⚠️ Cannot load - PyTorch not available")
+            print("[WARN] Cannot load - PyTorch not available")
             return False
         
         if not os.path.exists(path):
-            print(f"⚠️ Model file not found: {path}")
+            print(f"[WARN] Model file not found: {path}")
             return False
         
         try:
@@ -319,11 +319,11 @@ class NeuralNetworkPredictor:
             self.total_predictions = checkpoint.get('total_predictions', 0)
             self.total_updates = checkpoint.get('total_updates', 0)
             
-            print(f"✅ Model loaded from {path}")
+            print(f"[OK] Model loaded from {path}")
             return True
             
         except Exception as e:
-            print(f"⚠️ Failed to load model: {e}")
+            print(f"[WARN] Failed to load model: {e}")
             return False
     
     def get_statistics(self) -> dict:

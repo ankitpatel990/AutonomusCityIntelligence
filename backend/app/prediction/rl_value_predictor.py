@@ -66,13 +66,13 @@ class RLValueFunctionPredictor:
                 # For stable-baselines3 PPO
                 if hasattr(rl_model, 'policy') and hasattr(rl_model.policy, 'value_net'):
                     self.value_net = rl_model.policy.value_net
-                    print("✅ RL Value Function Predictor initialized with value network")
+                    print("[OK] RL Value Function Predictor initialized with value network")
                 else:
-                    print("⚠️ Could not access value network from RL model")
+                    print("[WARN] Could not access value network from RL model")
             except Exception as e:
-                print(f"⚠️ Error accessing RL model: {e}")
+                print(f"[WARN] Error accessing RL model: {e}")
         else:
-            print("ℹ️ RLValueFunctionPredictor initialized without model")
+            print("[INFO] RLValueFunctionPredictor initialized without model")
     
     def set_model(self, rl_model: 'PPO'):
         """
@@ -85,10 +85,10 @@ class RLValueFunctionPredictor:
         
         if hasattr(rl_model, 'policy') and hasattr(rl_model.policy, 'value_net'):
             self.value_net = rl_model.policy.value_net
-            print("✅ RL model set with value network")
+            print("[OK] RL model set with value network")
         else:
             self.value_net = None
-            print("⚠️ Could not access value network from RL model")
+            print("[WARN] Could not access value network from RL model")
     
     def is_ready(self) -> bool:
         """Check if predictor has a valid model"""
@@ -131,7 +131,7 @@ class RLValueFunctionPredictor:
             return predictions
             
         except Exception as e:
-            print(f"⚠️ RL prediction failed: {e}")
+            print(f"[WARN] RL prediction failed: {e}")
             return {}
     
     def _value_to_congestion_risk(self, value: float) -> float:
@@ -222,7 +222,7 @@ class RLValueFunctionPredictor:
                 )
         
         except Exception as e:
-            print(f"⚠️ Error decomposing prediction: {e}")
+            print(f"[WARN] Error decomposing prediction: {e}")
             # Return at least overall prediction
             predictions['OVERALL'] = RLValuePrediction(
                 junction_id='OVERALL',

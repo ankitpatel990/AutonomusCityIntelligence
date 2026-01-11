@@ -23,8 +23,9 @@ import type {
   IncidentStatistics,
   DetectionHistoryItem
 } from '../types/incident';
+import { transformKeys } from '../utils/transformKeys';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -66,25 +67,25 @@ class ApiClient {
   // ============================================
 
   async getSystemState(): Promise<SystemState> {
-    const response = await this.client.get<SystemState>('/state');
-    return response.data;
+    const response = await this.client.get('/state');
+    return transformKeys<SystemState>(response.data);
   }
 
   async getVehicles(type?: string): Promise<Vehicle[]> {
-    const response = await this.client.get<Vehicle[]>('/vehicles', { 
+    const response = await this.client.get('/vehicles', { 
       params: { type } 
     });
-    return response.data;
+    return transformKeys<Vehicle[]>(response.data);
   }
 
   async getJunctions(): Promise<Junction[]> {
-    const response = await this.client.get<Junction[]>('/junctions');
-    return response.data;
+    const response = await this.client.get('/junctions');
+    return transformKeys<Junction[]>(response.data);
   }
 
   async getRoads(): Promise<RoadSegment[]> {
-    const response = await this.client.get<RoadSegment[]>('/roads');
-    return response.data;
+    const response = await this.client.get('/roads');
+    return transformKeys<RoadSegment[]>(response.data);
   }
 
   async getDensity(): Promise<{ citywide: number; perJunction: Record<string, number>; perRoad: Record<string, number> }> {
@@ -233,7 +234,15 @@ class ApiClient {
 
   async getChallanStats(): Promise<{ total: number; paid: number; pending: number; totalFines: number; collectedFines: number }> {
     const response = await this.client.get('/challans/stats');
-    return response.data;
+    // Map API response to expected format
+    const data = response.data;
+    return {
+      total: data.totalChallans || 0,
+      paid: Math.round((data.complianceRate || 0) / 100 * (data.totalChallans || 0)),
+      pending: Math.round((100 - (data.complianceRate || 0)) / 100 * (data.totalChallans || 0)),
+      totalFines: data.totalRevenue || 0,
+      collectedFines: (data.totalRevenue || 0) - (data.pendingRevenue || 0),
+    };
   }
 
   // ============================================

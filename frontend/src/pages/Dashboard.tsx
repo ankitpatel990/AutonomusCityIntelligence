@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { CityMap } from '../components/CityMap';
+import { GandhinagarMap } from '../components/GandhinagarMap';
 import { ControlPanel } from '../components/ControlPanel';
 import { StatisticsPanel } from '../components/StatisticsPanel';
 import { EmergencySafetyPanel } from '../components/EmergencySafetyPanel';
@@ -89,17 +89,25 @@ export const Dashboard: React.FC = () => {
         <div className="col-span-12 xl:col-span-8">
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-white">City Traffic Visualization</h2>
+              <h2 className="text-lg font-bold text-white">Live Traffic Map - Gandhinagar</h2>
               <div className="flex items-center gap-2 text-xs text-slate-400">
                 <span className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
                   Live
                 </span>
                 <span>•</span>
-                <span>Gandhinagar Digital Twin</span>
+                <span>OpenStreetMap</span>
               </div>
             </div>
-            <CityMap width={750} height={550} showGrid={true} showLabels={true} />
+            <div className="w-full" style={{ height: '550px', minHeight: '550px' }}>
+              <GandhinagarMap 
+                height="100%" 
+                showVehicles={true} 
+                showJunctions={true} 
+                showRoads={true} 
+                showTrafficDensity={true} 
+              />
+            </div>
           </div>
         </div>
 
@@ -122,4 +130,5 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
+
 

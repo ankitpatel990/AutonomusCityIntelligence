@@ -16,6 +16,8 @@ from pydantic import BaseModel, Field
 from typing import Literal, Dict, Any
 import time
 
+from app.simulation import get_simulation_manager
+
 router = APIRouter(prefix="/api/simulation", tags=["simulation"])
 
 
@@ -61,8 +63,8 @@ async def start_simulation():
     Begins spawning vehicles, running physics updates,
     and processing traffic flow.
     """
-    # TODO: Implement with SimulationManager
-    # simulation_manager.start()
+    sim = get_simulation_manager()
+    sim.start()
     
     return SimulationResponse(
         status="started",
@@ -77,8 +79,8 @@ async def stop_simulation():
     
     Stops all simulation activity. Use /reset to clear state.
     """
-    # TODO: Implement with SimulationManager
-    # simulation_manager.stop()
+    sim = get_simulation_manager()
+    sim.stop()
     
     return SimulationResponse(
         status="stopped",
@@ -94,8 +96,8 @@ async def pause_simulation():
     Freezes all vehicle movement and signal changes.
     Use /resume to continue.
     """
-    # TODO: Implement with SimulationManager
-    # simulation_manager.pause()
+    sim = get_simulation_manager()
+    sim.pause()
     
     return SimulationResponse(
         status="paused",
@@ -110,8 +112,8 @@ async def resume_simulation():
     
     Continues from paused state.
     """
-    # TODO: Implement with SimulationManager
-    # simulation_manager.resume()
+    sim = get_simulation_manager()
+    sim.resume()
     
     return SimulationResponse(
         status="resumed",
@@ -127,8 +129,8 @@ async def reset_simulation():
     Clears all vehicles, resets signals, and restarts timing.
     WARNING: This will clear all in-memory simulation data.
     """
-    # TODO: Implement with SimulationManager
-    # simulation_manager.reset()
+    sim = get_simulation_manager()
+    sim.reset()
     
     return SimulationResponse(
         status="reset",
@@ -146,8 +148,8 @@ async def set_simulation_speed(request: SpeedRequest):
     - 5x: 5 times faster
     - 10x: 10 times faster
     """
-    # TODO: Implement with SimulationManager
-    # simulation_manager.set_speed(request.multiplier)
+    sim = get_simulation_manager()
+    sim.set_speed(request.multiplier)
     
     return {
         "status": "speed_set",
@@ -165,16 +167,18 @@ async def get_simulation_status():
     
     Response time target: < 100ms
     """
-    # TODO: Get actual status from SimulationManager
+    sim = get_simulation_manager()
+    status = sim.get_status()
+    
     return SimulationStatusResponse(
-        running=False,
-        paused=False,
-        currentTime=0,
-        timeMultiplier=1,
-        totalVehicles=0,
-        vehiclesSpawned=0,
-        vehiclesReached=0,
-        startTime=0
+        running=status["running"],
+        paused=status["paused"],
+        currentTime=status["currentTime"],
+        timeMultiplier=status["timeMultiplier"],
+        totalVehicles=status["totalVehicles"],
+        vehiclesSpawned=status["vehiclesSpawned"],
+        vehiclesReached=status["vehiclesReached"],
+        startTime=status["startTime"]
     )
 
 
@@ -190,15 +194,23 @@ async def spawn_vehicle(
     Creates a new vehicle at the specified start junction
     with a route to the end junction.
     """
-    # TODO: Implement with SimulationManager
-    # vehicle = simulation_manager.spawn_vehicle(...)
+    sim = get_simulation_manager()
     
-    return {
-        "status": "spawned",
-        "vehicleId": f"v-manual-{int(time.time())}",
-        "type": vehicle_type,
-        "startJunction": start_junction,
-        "endJunction": end_junction,
-        "timestamp": time.time()
-    }
-
+    try:
+        vehicle = sim.spawn_vehicle(
+            vehicle_type=vehicle_type,
+            start_junction=start_junction,
+            end_junction=end_junction
+        )
+        
+        return {
+            "status": "spawned",
+            "vehicleId": vehicle.id,
+            "type": vehicle.type,
+            "numberPlate": vehicle.number_plate,
+            "startJunction": vehicle.current_junction,
+            "endJunction": vehicle.destination,
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
